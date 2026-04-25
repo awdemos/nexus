@@ -27,12 +27,12 @@ Zed is an exceptional editor. Nexus takes that foundation and makes it the cente
         └───────────┴───────────┘
                     │
         ┌───────────┴───────────┐
-        │      Routage          │  ← LLM Router (localhost:8080)
-        │  (Multi-armed bandit) │
+        │  TensorZero / Merlin  │  ← LLM Gateway
         └───────────┬───────────┘
                     │
         ┌───────────┴───────────┐
-        │  TensorZero / Merlin  │  ← Model backends
+        │      Routage          │  ← LLM Router (localhost:8080)
+        │  (Multi-armed bandit) │
         └───────────────────────┘
 ```
 
