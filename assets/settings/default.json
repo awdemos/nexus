@@ -1022,9 +1022,9 @@
     // The default model to use when creating new threads.
     "default_model": {
       // The provider to use.
-      "provider": "zed.dev",
+      "provider": "routage",
       // The model to use.
-      "model": "claude-sonnet-4",
+      "model": "routage-router",
       // Whether thinking is enabled.
       "enable_thinking": false,
     },
@@ -2334,7 +2334,17 @@
     "openai": {
       "api_url": "https://api.openai.com/v1",
     },
-    "openai_compatible": {},
+    "openai_compatible": {
+      "routage": {
+        "api_url": "http://localhost:8080/v1",
+        "available_models": [
+          {
+            "name": "routage-router",
+            "max_tokens": 128000
+          }
+        ]
+      }
+    },
     "opencode": {
       "api_url": "https://opencode.ai/zen",
     },
@@ -2621,9 +2631,25 @@
   // Default: 60
   "context_server_timeout": 60,
   // Configures context servers for use by the agent.
-  "context_servers": {},
+  "context_servers": {
+    "mcp-server-app": {
+      "command": "python3",
+      "args": ["/path/to/mcp-server-app/run_server.py"]
+    },
+    "dagger-mcp": {
+      "command": "/path/to/dagger-mcp-server",
+      "args": []
+    }
+  },
   // Configures agent servers available in the agent panel.
-  "agent_servers": {},
+  "agent_servers": {
+    "pi": {
+      "type": "custom",
+      "command": "/path/to/pi-acp-bridge",
+      "args": [],
+      "env": {}
+    }
+  },
   "debugger": {
     "stepping_granularity": "line",
     "save_breakpoints": true,

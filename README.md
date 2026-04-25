@@ -1,46 +1,138 @@
-# Zed
+# Nexus
 
-[![Zed](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/zed-industries/zed/main/assets/badge/v0.json)](https://zed.dev)
-[![CI](https://github.com/zed-industries/zed/actions/workflows/run_tests.yml/badge.svg)](https://github.com/zed-industries/zed/actions/workflows/run_tests.yml)
+> *Converge and conquer.*
 
-Welcome to Zed, a high-performance, multiplayer code editor from the creators of [Atom](https://github.com/atom/atom) and [Tree-sitter](https://github.com/tree-sitter/tree-sitter).
+Nexus is a high-performance, AI-native code editor forked from [Zed](https://github.com/zed-industries/zed). It preserves 100% upstream compatibility while converging your entire development stack — LLM routers, coding agents, and MCP servers — into a single, sovereign environment.
 
----
+## Why Nexus?
 
-### Installation
+Zed is an exceptional editor. Nexus takes that foundation and makes it the center of gravity for your own AI infrastructure:
 
-On macOS, Linux, and Windows you can [download Zed directly](https://zed.dev/download) or install Zed via your local package manager ([macOS](https://zed.dev/docs/installation#macos)/[Linux](https://zed.dev/docs/linux#installing-via-a-package-manager)/[Windows](https://zed.dev/docs/windows#package-managers)).
+- **Routage** — Your multi-armed bandit LLM router becomes the default inference backend
+- **Pi** — Your personal coding agent speaks the Agent Client Protocol natively inside the agent panel
+- **MCP Servers** — Your context servers (MCP-Server-App, Dagger, and more) are pre-wired out of the box
+- **100% Upstream Compatible** — Rebase onto latest Zed in seconds, not hours
 
-Other platforms are not yet available:
+## Architecture
 
-- Web ([tracking issue](https://github.com/zed-industries/zed/issues/5396))
+```
+┌─────────────────────────────────────────┐
+│              Nexus (UI)                 │
+│  ┌─────────┐ ┌─────────┐ ┌──────────┐ │
+│  │ Editor  │ │ Agent   │ │ Terminal │ │
+│  │         │ │ Panel   │ │          │ │
+│  └────┬────┘ └────┬────┘ └────┬─────┘ │
+└───────┼───────────┼───────────┼───────┘
+        │           │           │
+        └───────────┴───────────┘
+                    │
+        ┌───────────┴───────────┐
+        │      Routage          │  ← LLM Router (localhost:8080)
+        │  (Multi-armed bandit) │
+        └───────────┬───────────┘
+                    │
+        ┌───────────┴───────────┐
+        │  TensorZero / Merlin  │  ← Model backends
+        └───────────────────────┘
+```
 
-### Developing Zed
+## Build
 
-- [Building Zed for macOS](./docs/src/development/macos.md)
-- [Building Zed for Linux](./docs/src/development/linux.md)
-- [Building Zed for Windows](./docs/src/development/windows.md)
+Nexus builds exactly like Zed. If you can build Zed, you can build Nexus.
 
-### Contributing
+```bash
+# macOS
+script/bootstrap
+cargo build --release
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for ways you can contribute to Zed.
+# Linux
+script/bootstrap
+cargo build --release
+```
 
-Also... we're hiring! Check out our [jobs](https://zed.dev/jobs) page for open roles.
+### Prerequisites
 
-### Licensing
+- Rust 1.80+
+- Node.js 20+ (for bundled extensions)
+- See [Zed's official docs](https://zed.dev/docs/development) for platform-specific requirements
 
-License information for third party dependencies must be correctly provided for CI to pass.
+## Staying Current with Upstream
 
-We use [`cargo-about`](https://github.com/EmbarkStudios/cargo-about) to automatically comply with open source licenses. If CI is failing, check the following:
+Nexus uses a two-branch model to make upstream merges trivial:
 
-- Is it showing a `no license specified` error for a crate you've created? If so, add `publish = false` under `[package]` in your crate's Cargo.toml.
-- Is the error `failed to satisfy license requirements` for a dependency? If so, first determine what license the project has and whether this system is sufficient to comply with this license's requirements. If you're unsure, ask a lawyer. Once you've verified that this system is acceptable add the license's SPDX identifier to the `accepted` array in `script/licenses/zed-licenses.toml`.
-- Is `cargo-about` unable to find the license for a dependency? If so, add a clarification field at the end of `script/licenses/zed-licenses.toml`, as specified in the [cargo-about book](https://embarkstudios.github.io/cargo-about/cli/generate/config.html#crate-configuration).
+- **`main`** — Fast-forward mirror of `zed-industries/zed`
+- **`nexus`** — Your working branch with the rebrand + integrations
 
-## Sponsorship
+```bash
+# One-command rebase
+./script/sync-upstream
+```
 
-Zed is developed by **Zed Industries, Inc.**, a for-profit company.
+This fetches latest upstream, fast-forwards `main`, rebases `nexus` on top, and pushes both branches to origin. Conflicts are rare because Nexus only touches packaging metadata, config paths, and default settings.
 
-If you’d like to financially support the project, you can do so via GitHub Sponsors.
-Sponsorships go directly to Zed Industries and are used as general company revenue.
-There are no perks or entitlements associated with sponsorship.
+## Integrations
+
+### Routage (Default LLM Provider)
+
+Routage is pre-configured as the default LLM provider in `assets/settings/default.json`:
+
+```json
+"language_models": {
+  "openai_compatible": {
+    "routage": {
+      "api_url": "http://localhost:8080/v1",
+      "available_models": [{ "name": "routage-router", "max_tokens": 128000 }]
+    }
+  }
+}
+```
+
+Start Routage, then open the agent panel. All completions route through your bandit router.
+
+### Pi (ACP Agent)
+
+The Pi bridge lives in your parent workspace at `../pi-acp-bridge`. Build it:
+
+```bash
+cd ../pi-acp-bridge
+cargo build --release
+```
+
+Then select **Pi** from the agent panel dropdown.
+
+### MCP Context Servers
+
+Edit `assets/settings/default.json` and update the `context_servers` block with your local paths:
+
+```json
+"context_servers": {
+  "mcp-server-app": {
+    "command": "python3",
+    "args": ["/path/to/mcp-server-app/run_server.py"]
+  },
+  "dagger-mcp": {
+    "command": "/path/to/dagger-mcp-server",
+    "args": []
+  }
+}
+```
+
+## Product Suite
+
+Nexus is part of a coherent sovereign computing stack:
+
+| Project | Role |
+|---------|------|
+| **Nexus** | IDE — this repo |
+| [RegicideOS](https://github.com/awdemos/RegicideOS) | AI-native Linux distribution |
+| [Merlin](https://github.com/awdemos/merlin) / [Routage](https://github.com/awdemos/routage) | LLM routers |
+| [Pi](https://github.com/awdemos/pi) | Coding agent |
+| [Memento](https://github.com/awdemos/opencode-memento) | Coding memory/context |
+
+## License
+
+Nexus inherits Zed's licensing: GPL-3.0-or-later for the editor core. See individual crates for their specific licenses.
+
+## Contributing
+
+This is a personal fork. Issues and PRs are welcome, but the primary goal is upstream compatibility — keep changes surgical.

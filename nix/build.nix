@@ -372,11 +372,11 @@ craneLib.buildPackage (
     '';
 
     meta = {
-      description = "High-performance, multiplayer code editor from the creators of Atom and Tree-sitter";
+      description = "High-performance, AI-native code editor";
       homepage = "https://zed.dev";
       changelog = "https://zed.dev/releases/preview";
       license = lib.licenses.gpl3Only;
-      mainProgram = "zed";
+      mainProgram = "nexus";
       platforms = lib.platforms.linux ++ lib.platforms.darwin;
     };
   }

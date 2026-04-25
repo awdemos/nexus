@@ -1,0 +1,33 @@
+#!/bin/bash
+# sync-upstream — Rebase Nexus onto latest Zed upstream
+#
+# Usage: ./script/sync-upstream
+# Requirements: origin → your fork, upstream → zed-industries/zed
+
+set -euo pipefail
+
+REMOTE_UPSTREAM="upstream"
+REMOTE_ORIGIN="origin"
+BRANCH_UPSTREAM="main"
+BRANCH_CUSTOM="nexus"
+
+echo "=== Fetching ${REMOTE_UPSTREAM}/${BRANCH_UPSTREAM} ==="
+git fetch "${REMOTE_UPSTREAM}" "${BRANCH_UPSTREAM}"
+
+echo "=== Updating local ${BRANCH_UPSTREAM} ==="
+git checkout "${BRANCH_UPSTREAM}"
+git reset --hard "${REMOTE_UPSTREAM}/${BRANCH_UPSTREAM}"
+
+echo "=== Rebasing ${BRANCH_CUSTOM} onto ${BRANCH_UPSTREAM} ==="
+git checkout "${BRANCH_CUSTOM}"
+if git rebase "${BRANCH_UPSTREAM}"; then
+    echo "=== Pushing to ${REMOTE_ORIGIN} ==="
+    git push "${REMOTE_ORIGIN}" "${BRANCH_UPSTREAM}"
+    git push "${REMOTE_ORIGIN}" "${BRANCH_CUSTOM}" --force-with-lease
+    echo "=== Done. Nexus is now on top of latest upstream. ==="
+else
+    echo "!!! Rebase failed. Resolve conflicts manually, then run:" >&2
+    echo "    git rebase --continue" >&2
+    echo "    git push origin ${BRANCH_CUSTOM} --force-with-lease" >&2
+    exit 1
+fi
