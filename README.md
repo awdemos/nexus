@@ -1,8 +1,8 @@
 # Nexus
 
-> *Converge and conquer.*
-
 Nexus is a high-performance, AI-native code editor forked from [Zed](https://github.com/zed-industries/zed). It preserves 100% upstream compatibility while converging your entire development stack — LLM routers, coding agents, and MCP servers — into a single, sovereign environment.
+
+> Looking for the original Zed README? See [ZED-README.md](./ZED-README.md).
 
 ## Why Nexus?
 
